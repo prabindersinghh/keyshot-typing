@@ -10,15 +10,15 @@ Windows app; this extension just adds VS Code conveniences:
 It talks to the app over the local named pipe `\\.\pipe\KeyShot.Control` (current user only).
 The extension never reads or sends keystrokes.
 
-## Install (from source)
+## Install
 
-```powershell
-cd vscode-extension
-npx @vscode/vsce package          # produces keyshot-vscode-1.0.0.vsix
-code --install-extension keyshot-vscode-1.0.0.vsix
-```
+1. Install the KeyShot app first. See [the main README](../README.md#install-in-30-seconds).
+2. Download **`keyshot-vscode-<version>.vsix`** from the
+   [latest release](https://github.com/prabindersinghh/keyshot-typing/releases/latest).
+3. In VS Code: **Extensions** (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>) → **⋯** → **Install from VSIX…** → pick the file.
 
-Or for development: open this folder in VS Code and press <kbd>F5</kbd>.
+Build it yourself: `cd vscode-extension; npx @vscode/vsce package`. For development, open this folder in
+VS Code and press <kbd>F5</kbd>.
 
 ## Settings
 
