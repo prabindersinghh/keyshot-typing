@@ -186,7 +186,7 @@ public class ShotMixerTests
     }
 
     [Fact]
-    public void Concurrent_triggers_from_another_thread_are_safe()
+    public async Task Concurrent_triggers_from_another_thread_are_safe()
     {
         var mixer = new ShotMixer(48000, 2, Bank());
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
@@ -196,7 +196,7 @@ public class ShotMixerTests
         });
         var buffer = new float[960];
         while (!cts.IsCancellationRequested) mixer.Read(buffer);
-        producer.Wait();
+        await producer;
         Assert.InRange(mixer.ActiveVoices, 0, ShotMixer.MaxVoices);
     }
 }
