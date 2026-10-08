@@ -14,30 +14,39 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'   # Invoke-WebRequest is much faster without the progress bar
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$repo = 'prabindersinghh/keyshot-typing'
+# "latest/download" links always point at the newest release and, unlike the GitHub API,
+# have no per-IP rate limit (which shared/mobile IPs hit easily).
+$base = 'https://github.com/prabindersinghh/keyshot-typing/releases/latest/download'
 $assetName = 'KeyShot-win-x64.zip'
 $installDir = Join-Path $env:LOCALAPPDATA 'Programs\KeyShot'
 $tmp = Join-Path ([IO.Path]::GetTempPath()) ("keyshot-" + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force $tmp | Out-Null
 
-try {
-    Write-Host 'Finding the latest KeyShot release...' -ForegroundColor Cyan
-    $release = Invoke-RestMethod "https://api.github.com/repos/$repo/releases/latest" -Headers @{ 'User-Agent' = 'keyshot-installer' }
-    $zipAsset = $release.assets | Where-Object name -eq $assetName
-    $sumAsset = $release.assets | Where-Object name -eq 'SHA256SUMS.txt'
-    if (-not $zipAsset) { throw "Release $($release.tag_name) has no $assetName." }
-
-    Write-Host "Downloading KeyShot $($release.tag_name) ($([math]::Round($zipAsset.size / 1MB)) MB)..." -ForegroundColor Cyan
-    $zip = Join-Path $tmp $assetName
-    Invoke-WebRequest $zipAsset.browser_download_url -OutFile $zip -UseBasicParsing
-
-    if ($sumAsset) {
-        $sums = (Invoke-WebRequest $sumAsset.browser_download_url -UseBasicParsing).Content
-        $expected = ($sums -split "`n" | Where-Object { $_ -match [regex]::Escape($assetName) + '\s*$' } | ForEach-Object { ($_ -split '\s+')[0] }) | Select-Object -First 1
-        $actual = (Get-FileHash $zip -Algorithm SHA256).Hash
-        if (-not $expected -or $actual -ne $expected.ToUpperInvariant()) { throw 'Checksum mismatch: the download is corrupt. Please try again.' }
-        Write-Host 'Checksum OK.' -ForegroundColor DarkGray
+function Get-WithRetry([string]$url, [string]$outFile) {
+    for ($attempt = 1; ; $attempt++) {
+        try {
+            if ($outFile) { Invoke-WebRequest $url -OutFile $outFile -UseBasicParsing; return }
+            return (Invoke-WebRequest $url -UseBasicParsing).Content
+        }
+        catch {
+            if ($attempt -ge 3) { throw }
+            Write-Host "  Network hiccup, retrying ($attempt/3)..." -ForegroundColor DarkYellow
+            Start-Sleep -Seconds (2 * $attempt)
+        }
     }
+}
+
+try {
+    Write-Host 'Downloading the latest KeyShot (about 70 MB)...' -ForegroundColor Cyan
+    $zip = Join-Path $tmp $assetName
+    Get-WithRetry "$base/$assetName" $zip
+
+    $sums = Get-WithRetry "$base/SHA256SUMS.txt"
+    if ($sums -is [byte[]]) { $sums = [Text.Encoding]::UTF8.GetString($sums) }
+    $expected = ($sums -split "`n" | Where-Object { $_ -match [regex]::Escape($assetName) + '\s*$' } | ForEach-Object { ($_ -split '\s+')[0] }) | Select-Object -First 1
+    $actual = (Get-FileHash $zip -Algorithm SHA256).Hash
+    if (-not $expected -or $actual -ne $expected.ToUpperInvariant()) { throw 'Checksum mismatch: the download is corrupt. Please try again.' }
+    Write-Host 'Checksum OK.' -ForegroundColor DarkGray
 
     # Update in place: overwrite shipped files, keep settings (%APPDATA%\KeyShot) and any packs you added.
     Get-Process KeyShot -ErrorAction SilentlyContinue | Stop-Process -Force
@@ -55,7 +64,8 @@ try {
         $lnk.Save()
     }
 
-    Write-Host "KeyShot $($release.tag_name) installed. Starting it now..." -ForegroundColor Green
+    $version = (Get-Item $exe).VersionInfo.ProductVersion -replace '\+.*$', ''   # drop "+<commit>" suffix
+    Write-Host "KeyShot $version installed. Starting it now..." -ForegroundColor Green
     Write-Host 'Press ENABLE (or Ctrl+Shift+K anywhere) and start typing. Pick sounds under Mode.'
     Start-Process $exe
 }
