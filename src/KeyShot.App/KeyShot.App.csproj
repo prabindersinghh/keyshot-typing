@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>KeyShot</AssemblyName>
+    <RootNamespace>KeyShot.App</RootNamespace>
+    <ApplicationIcon>Assets\keyshot.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- WPF owns DPI via the manifest; WinForms is only used for the tray icon. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+    <!-- Keep startup and the first keystroke fast. -->
+    <TieredPGO>true</TieredPGO>
+    <TieredCompilationQuickJitForLoops>true</TieredCompilationQuickJitForLoops>
+    <ServerGarbageCollector>false</ServerGarbageCollector>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KeyShot.Core\KeyShot.Core.csproj" />
+    <ProjectReference Include="..\KeyShot.Input\KeyShot.Input.csproj" />
+    <ProjectReference Include="..\KeyShot.Audio\KeyShot.Audio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WinForms is only used for the tray icon; keep its types out of the WPF global namespace. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\keyshot.ico" />
+    <Resource Include="Assets\keyshot-off.ico" />
+    <Content Include="Sounds\**\*.*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

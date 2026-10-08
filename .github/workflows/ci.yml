@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore KeyShot.sln
+
+      - name: Build
+        run: dotnet build KeyShot.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test KeyShot.sln -c Release --no-build --logger "trx;LogFileName=results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: tests/**/TestResults/*.trx
+
+  vscode-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Syntax check
+        run: node --check vscode-extension/extension.js
+      - name: Package
+        working-directory: vscode-extension
+        run: npx --yes @vscode/vsce package --out keyshot-vscode.vsix

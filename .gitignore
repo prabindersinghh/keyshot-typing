@@ -1,0 +1,29 @@
+# Build output
+bin/
+obj/
+publish/
+artifacts/
+TestResults/
+*.binlog
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+*.rsuser
+
+# Sound packs: only the original CC0 "Shotgun" pack is distributed.
+# Raw recordings and packs made from third-party audio stay local (licenses forbid redistribution).
+sounds-raw/
+src/KeyShot.App/Sounds/*
+!src/KeyShot.App/Sounds/Shotgun/
+
+# VS Code extension
+vscode-extension/node_modules/
+*.vsix
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

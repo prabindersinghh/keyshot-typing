@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Test
+        run: dotnet test KeyShot.sln -c Release
+
+      - name: Publish (self-contained, no .NET install needed)
+        run: >
+          dotnet publish src/KeyShot.App/KeyShot.App.csproj -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true -p:DebugType=embedded
+          -o out/self-contained
+
+      - name: Publish (framework-dependent, needs .NET 10 Desktop Runtime)
+        run: >
+          dotnet publish src/KeyShot.App/KeyShot.App.csproj -c Release -r win-x64 --self-contained false
+          -p:PublishSingleFile=true -p:DebugType=embedded
+          -o out/framework
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}"
+          foreach ($kind in 'self-contained', 'framework') {
+            Copy-Item README.md, LICENSE, THIRD_PARTY_NOTICES.md "out/$kind/"
+          }
+          Compress-Archive -Path out/self-contained/* -DestinationPath "KeyShot-win-x64.zip"
+          Compress-Archive -Path out/framework/* -DestinationPath "KeyShot-win-x64-framework.zip"
+          Push-Location vscode-extension
+          npx --yes @vscode/vsce package --out "../keyshot-vscode-$($version.TrimStart('v')).vsix"
+          Pop-Location
+          Get-FileHash KeyShot-*.zip, *.vsix -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } |
+            Set-Content SHA256SUMS.txt
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" KeyShot-win-x64.zip KeyShot-win-x64-framework.zip (Get-Item *.vsix).Name SHA256SUMS.txt `
+            --title "KeyShot ${{ github.ref_name }}" --generate-notes

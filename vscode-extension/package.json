@@ -1,0 +1,46 @@
+{
+  "name": "keyshot-vscode",
+  "displayName": "KeyShot",
+  "description": "Status and controls for the KeyShot desktop app (shotgun sounds for every keystroke).",
+  "version": "1.0.0",
+  "publisher": "keyshot",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/prabindersinghh/keyshot-typing" },
+  "bugs": { "url": "https://github.com/prabindersinghh/keyshot-typing/issues" },
+  "homepage": "https://github.com/prabindersinghh/keyshot-typing/tree/main/vscode-extension",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Other"],
+  "os": ["win32"],
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      { "command": "keyshot.enable", "title": "KeyShot: Enable" },
+      { "command": "keyshot.disable", "title": "KeyShot: Disable" },
+      { "command": "keyshot.toggle", "title": "KeyShot: Toggle" },
+      { "command": "keyshot.launch", "title": "KeyShot: Launch App" },
+      { "command": "keyshot.showSettings", "title": "KeyShot: Open Settings Window" }
+    ],
+    "configuration": {
+      "title": "KeyShot",
+      "properties": {
+        "keyshot.executablePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to KeyShot.exe. Empty = %LOCALAPPDATA%\\Programs\\KeyShot\\KeyShot.exe (the install.ps1 location)."
+        },
+        "keyshot.launchOnStartup": {
+          "type": "boolean",
+          "default": false,
+          "description": "Start KeyShot (minimized to tray) when VS Code starts, if it is not already running."
+        },
+        "keyshot.pollIntervalSeconds": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "description": "How often the status bar checks whether KeyShot is running."
+        }
+      }
+    }
+  }
+}
