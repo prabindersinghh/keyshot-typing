@@ -16,7 +16,7 @@ public sealed record KeyShotSettings
     public int CooldownMs { get; init; } = 15;
 
     /// <summary>Sound pack (folder name under Sounds/).</summary>
-    public string Mode { get; init; } = "Shotgun";
+    public string Mode { get; init; } = "Pump Shotgun";
 
     /// <summary>Space plays a heavier, deeper shot.</summary>
     public bool HeavySpace { get; init; } = true;
@@ -55,7 +55,7 @@ public sealed record KeyShotSettings
         Variation = Math.Clamp(Variation, 0, 100),
         CooldownMs = Math.Clamp(CooldownMs, 0, 250),
         AudioLatencyMs = Math.Clamp(AudioLatencyMs, 3, 100),
-        Mode = string.IsNullOrWhiteSpace(Mode) ? "Shotgun" : Mode.Trim(),
+        Mode = string.IsNullOrWhiteSpace(Mode) ? "Pump Shotgun" : Mode.Trim(),
         Hotkey = HotkeyGesture.TryParse(Hotkey, out _) ? Hotkey : "Ctrl+Shift+K",
     };
 }

@@ -20,7 +20,7 @@ public sealed class SettingsTests : IDisposable
         Assert.Equal("Ctrl+Shift+K", s.Hotkey);
         Assert.False(s.FireOnModifiers);
         Assert.True(s.IgnoreInjected);
-        Assert.Equal("Shotgun", s.Mode);
+        Assert.Equal("Pump Shotgun", s.Mode);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class SettingsTests : IDisposable
         Assert.Equal(0, s.Variation);
         Assert.Equal(250, s.CooldownMs);
         Assert.Equal(3, s.AudioLatencyMs);
-        Assert.Equal("Shotgun", s.Mode);
+        Assert.Equal("Pump Shotgun", s.Mode);
         Assert.Equal("Ctrl+Shift+K", s.Hotkey);
     }
 

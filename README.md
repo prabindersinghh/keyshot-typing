@@ -35,13 +35,21 @@ A tiny, low-latency Windows utility that plays shotgun sound effects as you type
 - **Sound packs**: drop a folder of `.wav`/`.mp3` files into `Sounds/` and pick it from **Mode**.
 - Optional **VS Code extension** with a status-bar toggle.
 
-## Download
+## Install (one line)
 
-1. Download the latest **`KeyShot-win-x64.zip`** from [Releases](https://github.com/prabindersinghh/keyshot-typing/releases/latest).
-   It's self-contained, so nothing else needs installing. If you already have the
-   [.NET 10 Desktop Runtime](https://dot.net/download), the smaller `KeyShot-win-x64-framework.zip` works too.
-2. Extract it anywhere and run **`KeyShot.exe`**.
-3. Press **ENABLE** (or **Ctrl+Shift+K** anywhere) and start typing.
+Open **PowerShell** and paste:
+
+```powershell
+irm https://raw.githubusercontent.com/prabindersinghh/keyshot-typing/main/scripts/get-keyshot.ps1 | iex
+```
+
+That's it. The script downloads the latest release, checks its checksum, installs it to
+`%LOCALAPPDATA%\Programs\KeyShot` (no admin), adds **Desktop** and **Start Menu** shortcuts and starts KeyShot.
+Press **ENABLE** (or **Ctrl+Shift+K** anywhere) and start typing. Run the same line again later to update.
+
+**Or install manually:** download **`KeyShot-win-x64.zip`** from
+[Releases](https://github.com/prabindersinghh/keyshot-typing/releases/latest), extract it anywhere and run
+`KeyShot.exe`. It's self-contained, so nothing else needs installing.
 
 > The exe isn't code-signed yet, so Windows SmartScreen may say *"Windows protected your PC"*. Click
 > **More info → Run anyway**. On PCs with **Smart App Control** on, Windows may refuse to run unsigned
@@ -97,9 +105,20 @@ Settings are saved in `%APPDATA%\KeyShot\settings.json`. Advanced options that a
 
 ## Sound packs
 
-KeyShot ships with one pack, **Shotgun**: three original shotgun blasts **synthesized from scratch** by
-[`scripts/generate-sounds.ps1`](scripts/generate-sounds.ps1) and released as **CC0** (public domain).
-Each blast has three layers: a mid-range noise *crack*, a falling sine *boom*, and a stereo *room* tail.
+KeyShot ships with six packs. Pick one under **Mode**:
+
+| Mode | Normal keys | Space | Enter |
+|---|---|---|---|
+| **Pump Shotgun** *(default)* | full shotgun blast | — | blast + second sound |
+| **Shotgun** | 3 synthesized blasts | deeper blast | deepest blast |
+| **Echo Gun** | dry gunshot | shot + room | shot + long echo |
+| **Assault Rifle** | 6 single rounds | last round ringing out | 3-round burst |
+| **Minigun** | end of a burst | longer burst | full burst |
+| **Laser Pistol** | 4 different pews | zap with tail | rapid volley |
+
+The **Shotgun** pack is original, synthesized by [`scripts/generate-sounds.ps1`](scripts/generate-sounds.ps1)
+(CC0). The other packs are edited from free recordings on Pixabay. Thanks to Universfield, flutie8211, qubodup,
+ScottishPerson and NXRT. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for sources and licenses.
 
 Add your own packs by creating a folder next to `KeyShot.exe`:
 
@@ -133,9 +152,8 @@ normalizes levels. You describe the cuts in a JSON recipe:
 python scripts\make-pack.py my-recipe.json      # needs numpy + ffmpeg
 ```
 
-> Check the license of any sound you add. Many free-sound sites allow use in apps but **not** redistribution
-> of the raw files, so don't commit such packs to a public fork. This repo's `.gitignore` keeps everything except
-> `Sounds/Shotgun` local by default.
+> Keep raw source files in `sounds-raw/` (git-ignored) and commit only the edited packs. Credit the creators
+> in `THIRD_PARTY_NOTICES.md`.
 
 ## Architecture
 
@@ -169,6 +187,7 @@ privately as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-[MIT](LICENSE) for the code. The bundled sounds are CC0. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+[MIT](LICENSE) for the code. The sound packs have their own licenses (CC0 and the Pixabay Content License), listed in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 KeyShot (this project) isn't affiliated with or endorsed by Luxion or its KeyShot® 3D rendering software.

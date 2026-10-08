@@ -2,7 +2,7 @@
   "name": "keyshot-vscode",
   "displayName": "KeyShot",
   "description": "Status and controls for the KeyShot desktop app (shotgun sounds for every keystroke).",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "keyshot",
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/prabindersinghh/keyshot-typing" },

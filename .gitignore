@@ -13,11 +13,8 @@ TestResults/
 *.suo
 *.rsuser
 
-# Sound packs: only the original CC0 "Shotgun" pack is distributed.
-# Raw recordings and packs made from third-party audio stay local (licenses forbid redistribution).
+# Raw, unedited source recordings stay local. Only the edited packs in src/KeyShot.App/Sounds ship.
 sounds-raw/
-src/KeyShot.App/Sounds/*
-!src/KeyShot.App/Sounds/Shotgun/
 
 # VS Code extension
 vscode-extension/node_modules/

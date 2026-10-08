@@ -38,12 +38,11 @@ it should only enqueue work.
 
 ## Contributing sound packs
 
-- Only submit audio you made yourself or that's licensed for redistribution (CC0 / CC-BY, credited in
-  `THIRD_PARTY_NOTICES.md`). Many free-sound sites forbid redistributing raw files. Those packs stay local.
+- Only submit audio you made yourself or that's free to use in software (CC0, CC-BY, the Pixabay Content License…).
+  Credit the creator in `THIRD_PARTY_NOTICES.md` and commit only the edited slices, not the raw downloads.
 - Cut raw recordings with `scripts/make-pack.py` (snaps to the attack, fades tails, normalizes levels).
 - Keep shots short: the attack should start within 3 ms (enforced by `Every_pack_loads_and_attacks_instantly`),
   and typical keystroke samples are 80–1500 ms.
-- Remember to un-ignore your pack folder in `.gitignore`.
 
 ## Reporting bugs
 
